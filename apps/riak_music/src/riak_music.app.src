@@ -6,7 +6,8 @@
   {applications, [
                   kernel,
                   stdlib,
-                  riak_core                  
+                  riak_core,
+                  riak_pipe
                  ]},
   {mod, { riak_music_app, []}},
   {env, []}

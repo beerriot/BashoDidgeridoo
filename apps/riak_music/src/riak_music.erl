@@ -51,17 +51,9 @@ stop(Pid) ->
 play_note(MidiController, MidiNote, Amplitude, Duration) 
   when MidiNote >= 0 andalso MidiNote =< 127,
        Amplitude >= 0 andalso Amplitude =< 1 ->
-    %% Route based on the MidiController/MidiNote combination...
-    ObjectName = {MidiController, MidiNote},
-    Key = chash:key_of(term_to_binary(ObjectName)),
-
-    %% Get the preflist...
-    NVal = 1,
-    PrefList = riak_core_apl:get_apl(Key, NVal, riak_music),
-
     %% Send the play command...
     Message = {play, MidiController, MidiNote, Amplitude, Duration},
-    riak_core_vnode_master:command(PrefList, Message, riak_music_vnode_master),
+    riak_music_didgeridoo:play(Message),
     ok;
 play_note(_, _, _, _) ->
     ok.

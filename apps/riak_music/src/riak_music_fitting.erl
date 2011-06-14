@@ -14,36 +14,25 @@
 
 %% Copyright (c) 2007-2010 Basho Technologies, Inc.  All Rights Reserved.
 
--module(riak_music_vnode).
--behaviour(riak_core_vnode).
+-module(riak_music_fitting).
+-behaviour(riak_pipe_vnode_worker).
 -include("riak_music.hrl").
 
--export([start_vnode/1,
-         init/1,
-         terminate/2,
-         handle_command/3,
-         is_empty/1,
-         delete/1,
-         handle_handoff_command/3,
-         handoff_starting/2,
-         handoff_cancelled/1,
-         handoff_finished/2,
-         handle_handoff_data/2,
-         encode_handoff_item/2,
-         generate_au/3]).
+-export([
+         init/2,
+         process/3,
+         done/1
+        ]).
 
 -record(state, {partition, method}).
 
 %% API
-start_vnode(I) ->
-    riak_core_vnode_master:get_vnode_pid(I, ?MODULE).
-
-init([Partition]) ->
+init(Partition, _FittingDetails) ->
     %% TODO: Test for various methods of playing sounds.
     Method = riak_music_utils:detect_audio_method(),
     {ok, #state { partition=Partition, method=Method }}.
 
-handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
+process({play, _Controller, MidiNote, Amplitude, Duration}, _Last, State) ->
     %% Print out the note...
     if
         Duration < 0.1 -> Note = [9834];
@@ -56,40 +45,10 @@ handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, Stat
     
     %% Play the note...
     play(State#state.method, MidiNote, Amplitude, Duration),
-    {noreply, State};
-
-handle_command(Message, _Sender, State) ->
-    ?PRINT({unhandled_command, Message}),
-    {noreply, State}.
-
-handle_handoff_command(Message, _Sender, State) ->
-    ?PRINT({unhandled_handoff_command, Message}),
-    {noreply, State}.
-
-handoff_starting(_TargetNode, State) ->
-    {true, State}.
-
-handoff_cancelled(State) ->
     {ok, State}.
 
-handoff_finished(_TargetNode, State) ->
-    {ok, State}.
-
-handle_handoff_data(_Data, State) ->
-    {reply, ok, State}.
-
-encode_handoff_item(_ObjectName, _ObjectValue) ->
-    <<>>.
-
-is_empty(State) ->
-    {true, State}.
-
-delete(State) ->
-    {ok, State}.
-
-terminate(_Reason, _State) ->
+done(_State) ->
     ok.
-
 
 %% PRIVATE FUNCTIONS
 

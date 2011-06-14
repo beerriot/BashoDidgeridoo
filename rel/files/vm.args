@@ -1,8 +1,8 @@
 ## Hostname is set automatically.
--name banjo@127.0.0.1
+-name didgeridoo@127.0.0.1
 
 ## Cookie for distributed erlang
--setcookie banjo
+-setcookie didgeridoo
 
 ## Enable kernel poll and a few async threads
 +K true

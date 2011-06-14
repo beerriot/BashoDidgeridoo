@@ -21,8 +21,6 @@ start(_StartType, _StartArgs) ->
     %% with riak_core.
     case riak_music_sup:start_link() of
         {ok, Pid} ->
-            %% Register our vnode module with Riak Core.
-            riak_core:register_vnode_module(riak_music_vnode),
             riak_core_node_watcher:service_up(riak_music, self()),
             {ok, Pid};
         {error, Reason} ->

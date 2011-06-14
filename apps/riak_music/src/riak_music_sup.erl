@@ -24,8 +24,7 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    VMaster = {riak_music_vnode_master, 
-               {riak_core_vnode_master, start_link, [riak_music_vnode]}, 
-               permanent, 5000, worker, [riak_core_vnode_master]},
-    {ok, { {one_for_one, 5, 10}, [VMaster]} }.
-
+    Didgeridoo = {riak_music_didgeridoo,
+                  {riak_music_didgeridoo, start_link, []}, 
+                  permanent, 5000, worker, [riak_music_didgeridoo]},
+    {ok, { {one_for_one, 5, 10}, [Didgeridoo]} }.
