@@ -1,19 +1,26 @@
-
+.PHONY: rel deps test
 
 all: deps compile
 
 compile:
-	./rebar compile
+	@./rebar compile
+
+app:
+	@./rebar compile skip_deps=true
+
 deps:
-	./rebar get-deps
+	@./rebar get-deps
 
 clean:
-	./rebar clean
+	@./rebar clean
 
-distclean: clean devclean relclean ballclean
-	./rebar delete-deps
+distclean: clean
+	@./rebar delete-deps
 
-run: compile 
+test: all
+	@./rebar skip_deps=true eunit
+
+run: compile
 	erl \
 	-name phone1@127.0.0.1 \
 	-setcookie phone \
@@ -25,11 +32,10 @@ run: compile
 	-eval "application:start(riak_core)" \
 	-eval "application:start(riak_music)"
 
-rel:
-	./rebar compile generate
-	chmod 755 rel/basho_banjo/bin/banjo
+rel: compile
+	@./rebar generate
+	@chmod 755 rel/basho_banjo/bin/banjo
 
 rellink:
 	$(foreach app,$(wildcard apps/*), rm -rf rel/basho_banjo/lib/$(shell basename $(app))* && ln -sf $(abspath $(app)) rel/basho_banjo/lib;)
 	$(foreach dep,$(wildcard deps/*), rm -rf rel/basho_banjo/lib/$(shell basename $(dep))* && ln -sf $(abspath $(dep)) rel/basho_banjo/lib;)
-
