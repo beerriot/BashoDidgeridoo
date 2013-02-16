@@ -34,7 +34,7 @@ run: compile
 
 rel: compile
 	@./rebar generate
-	@chmod 755 rel/basho_banjo/bin/banjo
+	@chmod 755 rel/basho_didgeridoo/bin/didgeridoo
 
 rellink:
 	$(foreach app,$(wildcard apps/*), rm -rf rel/basho_banjo/lib/$(shell basename $(app))* && ln -sf $(abspath $(app)) rel/basho_banjo/lib;)
