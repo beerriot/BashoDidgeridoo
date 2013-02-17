@@ -47,11 +47,11 @@ play(Message) ->
 %% Description: Initiates the server
 %%--------------------------------------------------------------------
 init([]) ->
-    {ok, Head, _Sink} = riak_pipe:exec(
+    {ok, Pipe} = riak_pipe:exec(
                           [#fitting_spec{name={didgeridoo, node()},
                                          module=riak_music_fitting}],
                           []),
-    {ok, Head}.
+    {ok, Pipe}.
 
 %%--------------------------------------------------------------------
 %% Function: %% handle_call(Request, From, State) -> {reply, Reply, State} |
@@ -62,9 +62,9 @@ init([]) ->
 %%                                      {stop, Reason, State}
 %% Description: Handling call messages
 %%--------------------------------------------------------------------
-handle_call({play, Message}, _From, Head) ->
-    Reply = riak_pipe_vnode:queue_work(Head, Message),
-    {reply, Reply, Head}.
+handle_call({play, Message}, _From, Pipe) ->
+    Reply = riak_pipe:queue_work(Pipe, Message),
+    {reply, Reply, Pipe}.
 
 %%--------------------------------------------------------------------
 %% Function: handle_cast(Msg, State) -> {noreply, State} |
